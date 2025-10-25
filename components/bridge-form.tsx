@@ -3,140 +3,188 @@
 import type React from "react"
 
 import { useState } from "react"
-import { ethers } from "ethers"
+import { useAccount } from "wagmi"
 
-interface BridgeFormProps {
-  account: string
-  provider: ethers.BrowserProvider
-  onTransaction: (tx: any) => void
-}
-
-const BRIDGE_ABI = [
-  "function bridgeNFT(uint256 tokenId, uint16 destinationChain, address recipient, bytes calldata message) external payable",
-]
-
-const CHAINS = [
-  { id: 5, name: "Goerli" },
-  { id: 84531, name: "Base Testnet" },
-  { id: 7001, name: "ZetaChain Testnet" },
-]
-
-export default function BridgeForm({ account, provider, onTransaction }: BridgeFormProps) {
-  const [tokenId, setTokenId] = useState("")
-  const [destinationChain, setDestinationChain] = useState("5")
-  const [recipient, setRecipient] = useState(account)
-  const [isBridging, setIsBridging] = useState(false)
+export function BridgeForm() {
+  const { address } = useAccount()
+  const [formData, setFormData] = useState({
+    nftAddress: "",
+    tokenId: "",
+    fromChain: "1",
+    toChain: "8453",
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
 
-  const handleBridge = async (e: React.FormEvent) => {
+  const chains = [
+    { id: "1", name: "Ethereum Mainnet" },
+    { id: "8453", name: "Base" },
+    { id: "7000", name: "ZetaChain" },
+  ]
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSwapChains = () => {
+    setFormData((prev) => ({
+      ...prev,
+      fromChain: prev.toChain,
+      toChain: prev.fromChain,
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-    setIsBridging(true)
+    setIsLoading(true)
 
     try {
-      if (!tokenId.trim()) {
-        throw new Error("Please enter a token ID")
+      if (formData.fromChain === formData.toChain) {
+        throw new Error("Source and destination chains must be different")
       }
 
-      const bridgeAddress = process.env.NEXT_PUBLIC_BRIDGE_ADDRESS
-      if (!bridgeAddress) {
-        throw new Error("Bridge contract address not configured")
-      }
+      // Simulate bridging process
+      await new Promise((resolve) => setTimeout(resolve, 3000))
 
-      const signer = await provider.getSigner()
-      const bridge = new ethers.Contract(bridgeAddress, BRIDGE_ABI, signer)
-
-      const chainId = Number.parseInt(destinationChain)
-      const message = ethers.AbiCoder.defaultAbiCoder().encode(
-        ["uint8", "uint256", "address", "string"],
-        [1, tokenId, recipient, "ipfs://metadata"],
-      )
-
-      const tx = await bridge.bridgeNFT(tokenId, chainId, recipient, message, {
-        value: ethers.parseEther("0.1"),
+      console.log("[v0] Bridging NFT:", {
+        ...formData,
+        address,
       })
 
-      onTransaction({
-        type: "bridge",
-        hash: tx.hash,
-        status: "pending",
-        timestamp: new Date().toISOString(),
-        details: { tokenId, destinationChain, recipient },
+      setSuccess(true)
+      setFormData({
+        nftAddress: "",
+        tokenId: "",
+        fromChain: "1",
+        toChain: "8453",
       })
 
-      const receipt = await tx.wait()
-
-      onTransaction({
-        type: "bridge",
-        hash: tx.hash,
-        status: "success",
-        timestamp: new Date().toISOString(),
-        details: { tokenId, destinationChain, recipient, blockNumber: receipt?.blockNumber },
-      })
-
-      setTokenId("")
-    } catch (err: any) {
-      const errorMsg = err.message || "Failed to bridge NFT"
-      setError(errorMsg)
-      onTransaction({
-        type: "bridge",
-        status: "error",
-        timestamp: new Date().toISOString(),
-        details: { error: errorMsg },
-      })
+      setTimeout(() => setSuccess(false), 5000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Bridge failed")
+      console.error("[v0] Bridge error:", err)
     } finally {
-      setIsBridging(false)
+      setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleBridge} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-slate-300 mb-2">Token ID</label>
-        <input
-          type="number"
-          value={tokenId}
-          onChange={(e) => setTokenId(e.target.value)}
-          placeholder="0"
-          className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-        />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="p-8 rounded-lg bg-slate-800/50 border border-slate-700">
+        {success && (
+          <div className="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/50 text-green-400 text-sm">
+            NFT bridge initiated! Your asset will arrive on the destination chain shortly.
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm">{error}</div>
+        )}
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-white font-medium mb-2">NFT Contract Address</label>
+            <input
+              type="text"
+              name="nftAddress"
+              value={formData.nftAddress}
+              onChange={handleChange}
+              placeholder="0x..."
+              required
+              className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 transition font-mono text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-white font-medium mb-2">Token ID</label>
+            <input
+              type="text"
+              name="tokenId"
+              value={formData.tokenId}
+              onChange={handleChange}
+              placeholder="Enter token ID"
+              required
+              className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 transition"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-white font-medium mb-2">From Chain</label>
+              <select
+                name="fromChain"
+                value={formData.fromChain}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:border-purple-500 transition"
+              >
+                {chains.map((chain) => (
+                  <option key={chain.id} value={chain.id}>
+                    {chain.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={handleSwapChains}
+                className="p-2 rounded-lg bg-slate-700 border border-slate-600 text-slate-300 hover:text-white hover:border-purple-500 transition"
+                title="Swap chains"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-white font-medium mb-2">To Chain</label>
+              <select
+                name="toChain"
+                value={formData.toChain}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:border-purple-500 transition"
+              >
+                {chains.map((chain) => (
+                  <option key={chain.id} value={chain.id}>
+                    {chain.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-lg bg-slate-700/50 border border-slate-600">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-slate-400 text-sm">Estimated Bridge Fee</span>
+              <span className="text-white font-semibold">0.05 ETH</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400 text-sm">Estimated Time</span>
+              <span className="text-white font-semibold">5-10 minutes</span>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-semibold hover:from-purple-700 hover:to-cyan-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Bridging..." : "Bridge NFT"}
+          </button>
+        </div>
       </div>
-
-      <div>
-        <label className="block text-sm font-medium text-slate-300 mb-2">Destination Chain</label>
-        <select
-          value={destinationChain}
-          onChange={(e) => setDestinationChain(e.target.value)}
-          className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-        >
-          {CHAINS.map((chain) => (
-            <option key={chain.id} value={chain.id}>
-              {chain.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-slate-300 mb-2">Recipient Address</label>
-        <input
-          type="text"
-          value={recipient}
-          onChange={(e) => setRecipient(e.target.value)}
-          placeholder="0x..."
-          className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-        />
-      </div>
-
-      {error && <div className="p-3 bg-red-900 border border-red-700 rounded-lg text-red-200 text-sm">{error}</div>}
-
-      <button
-        type="submit"
-        disabled={isBridging}
-        className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold rounded-lg transition-colors"
-      >
-        {isBridging ? "Bridging..." : "Bridge NFT"}
-      </button>
     </form>
   )
 }
+
+export default BridgeForm

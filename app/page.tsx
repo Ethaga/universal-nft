@@ -1,86 +1,124 @@
 "use client"
-
-import { useState } from "react"
-import type { ethers } from "ethers"
-import WalletConnect from "@/components/wallet-connect"
-import MintForm from "@/components/mint-form"
-import BridgeForm from "@/components/bridge-form"
-import TransactionLog from "@/components/transaction-log"
+import Link from "next/link"
+import { useAccount } from "wagmi"
+import { Navigation } from "@/components/navigation"
+import { HeroSection } from "@/components/hero-section"
+import { FeaturesGrid } from "@/components/features-grid"
+import { StatsSection } from "@/components/stats-section"
 
 export default function Home() {
-  const [account, setAccount] = useState<string>("")
-  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null)
-  const [transactions, setTransactions] = useState<any[]>([])
-  const [activeTab, setActiveTab] = useState<"mint" | "bridge">("mint")
-
-  const handleWalletConnect = async (addr: string, prov: ethers.BrowserProvider) => {
-    setAccount(addr)
-    setProvider(prov)
-  }
-
-  const addTransaction = (tx: any) => {
-    setTransactions([tx, ...transactions])
-  }
+  const { isConnected } = useAccount()
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Mint Once, Launch Everywhere</h1>
-          <p className="text-slate-300">Universal NFT dApp powered by ZetaChain</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <Navigation />
 
-        {/* Wallet Connection */}
-        <div className="mb-8">
-          <WalletConnect onConnect={handleWalletConnect} />
-        </div>
+      <main className="pt-20">
+        <HeroSection isConnected={isConnected} />
+        <FeaturesGrid />
+        <StatsSection />
+      </main>
 
-        {account && provider ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              {/* Tabs */}
-              <div className="flex gap-4 mb-6">
-                <button
-                  onClick={() => setActiveTab("mint")}
-                  className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
-                    activeTab === "mint" ? "bg-blue-600 text-white" : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                  }`}
-                >
-                  Mint NFT
-                </button>
-                <button
-                  onClick={() => setActiveTab("bridge")}
-                  className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
-                    activeTab === "bridge" ? "bg-blue-600 text-white" : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                  }`}
-                >
-                  Bridge NFT
-                </button>
-              </div>
-
-              {/* Forms */}
-              <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-                {activeTab === "mint" ? (
-                  <MintForm account={account} provider={provider} onTransaction={addTransaction} />
-                ) : (
-                  <BridgeForm account={account} provider={provider} onTransaction={addTransaction} />
-                )}
-              </div>
+      <footer className="border-t border-slate-700 bg-slate-900/50 py-12 mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="text-white font-semibold mb-4">Product</h3>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Mint NFTs
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Bridge Assets
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Gallery
+                  </Link>
+                </li>
+              </ul>
             </div>
-
-            {/* Transaction Log */}
-            <div className="lg:col-span-1">
-              <TransactionLog transactions={transactions} />
+            <div>
+              <h3 className="text-white font-semibold mb-4">Chains</h3>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Ethereum
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Base
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    ZetaChain
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold mb-4">Resources</h3>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Docs
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    GitHub
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Support
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold mb-4">Legal</h3>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Terms
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition">
+                    Contact
+                  </Link>
+                </li>
+              </ul>
             </div>
           </div>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-slate-400 text-lg">Connect your wallet to get started</p>
+          <div className="border-t border-slate-700 pt-8 flex justify-between items-center">
+            <p className="text-slate-400 text-sm">© 2025 Universal NFT dApp. All rights reserved.</p>
+            <div className="flex gap-4">
+              <Link href="#" className="text-slate-400 hover:text-white transition">
+                Twitter
+              </Link>
+              <Link href="#" className="text-slate-400 hover:text-white transition">
+                Discord
+              </Link>
+              <Link href="#" className="text-slate-400 hover:text-white transition">
+                GitHub
+              </Link>
+            </div>
           </div>
-        )}
-      </div>
-    </main>
+        </div>
+      </footer>
+    </div>
   )
 }

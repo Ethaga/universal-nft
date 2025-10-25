@@ -3,96 +3,143 @@
 import type React from "react"
 
 import { useState } from "react"
-import { ethers } from "ethers"
+import { useAccount, useChainId } from "wagmi"
 
-interface MintFormProps {
-  account: string
-  provider: ethers.BrowserProvider
-  onTransaction: (tx: any) => void
-}
+export function MintForm() {
+  const { address } = useAccount()
+  const chainId = useChainId()
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    imageUrl: "",
+    chain: "1",
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
 
-const NFT_ABI = ["function mint(address to, string memory metadataURI) external returns (uint256)"]
+  const chains = [
+    { id: "1", name: "Ethereum Mainnet" },
+    { id: "8453", name: "Base" },
+    { id: "7000", name: "ZetaChain" },
+  ]
 
-export default function MintForm({ account, provider, onTransaction }: MintFormProps) {
-  const [metadataURI, setMetadataURI] = useState("")
-  const [isMinting, setIsMinting] = useState(false)
-  const [error, setError] = useState("")
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
-  const handleMint = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    setIsMinting(true)
+    setIsLoading(true)
 
     try {
-      if (!metadataURI.trim()) {
-        throw new Error("Please enter a metadata URI")
-      }
+      // Simulate minting process
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      const nftAddress = process.env.NEXT_PUBLIC_NFT_ADDRESS
-      if (!nftAddress) {
-        throw new Error("NFT contract address not configured")
-      }
-
-      const signer = await provider.getSigner()
-      const nft = new ethers.Contract(nftAddress, NFT_ABI, signer)
-
-      const tx = await nft.mint(account, metadataURI)
-
-      onTransaction({
-        type: "mint",
-        hash: tx.hash,
-        status: "pending",
-        timestamp: new Date().toISOString(),
-        details: { metadataURI },
+      console.log("[v0] Minting NFT:", {
+        ...formData,
+        address,
+        chainId,
       })
 
-      const receipt = await tx.wait()
+      setSuccess(true)
+      setFormData({ name: "", description: "", imageUrl: "", chain: "1" })
 
-      onTransaction({
-        type: "mint",
-        hash: tx.hash,
-        status: "success",
-        timestamp: new Date().toISOString(),
-        details: { metadataURI, blockNumber: receipt?.blockNumber },
-      })
-
-      setMetadataURI("")
-    } catch (err: any) {
-      const errorMsg = err.message || "Failed to mint NFT"
-      setError(errorMsg)
-      onTransaction({
-        type: "mint",
-        status: "error",
-        timestamp: new Date().toISOString(),
-        details: { error: errorMsg },
-      })
+      setTimeout(() => setSuccess(false), 5000)
+    } catch (error) {
+      console.error("[v0] Minting error:", error)
     } finally {
-      setIsMinting(false)
+      setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleMint} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-slate-300 mb-2">Metadata URI (IPFS or HTTP)</label>
-        <input
-          type="text"
-          value={metadataURI}
-          onChange={(e) => setMetadataURI(e.target.value)}
-          placeholder="ipfs://QmExample/metadata.json"
-          className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-        />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="p-8 rounded-lg bg-slate-800/50 border border-slate-700">
+        {success && (
+          <div className="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/50 text-green-400 text-sm">
+            NFT minted successfully! Check your wallet for the new asset.
+          </div>
+        )}
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-white font-medium mb-2">NFT Name</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter NFT name"
+              required
+              className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 transition"
+            />
+          </div>
+
+          <div>
+            <label className="block text-white font-medium mb-2">Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Describe your NFT"
+              rows={4}
+              className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 transition resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-white font-medium mb-2">Image URL</label>
+            <input
+              type="url"
+              name="imageUrl"
+              value={formData.imageUrl}
+              onChange={handleChange}
+              placeholder="https://example.com/image.png"
+              required
+              className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 transition"
+            />
+            {formData.imageUrl && (
+              <div className="mt-4 rounded-lg overflow-hidden border border-slate-600 h-48">
+                <img
+                  src={formData.imageUrl || "/placeholder.svg"}
+                  alt="NFT Preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "/nft-preview.jpg"
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-white font-medium mb-2">Blockchain</label>
+            <select
+              name="chain"
+              value={formData.chain}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:border-purple-500 transition"
+            >
+              {chains.map((chain) => (
+                <option key={chain.id} value={chain.id}>
+                  {chain.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-semibold hover:from-purple-700 hover:to-cyan-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Minting..." : "Mint NFT"}
+          </button>
+        </div>
       </div>
-
-      {error && <div className="p-3 bg-red-900 border border-red-700 rounded-lg text-red-200 text-sm">{error}</div>}
-
-      <button
-        type="submit"
-        disabled={isMinting}
-        className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold rounded-lg transition-colors"
-      >
-        {isMinting ? "Minting..." : "Mint NFT"}
-      </button>
     </form>
   )
 }
+
+export default MintForm

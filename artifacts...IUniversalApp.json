@@ -1,0 +1,189 @@
+{
+	"deploy": {
+		"VM:-": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"main:1": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"ropsten:3": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"rinkeby:4": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"kovan:42": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"goerli:5": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"Custom": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		}
+	},
+	"data": {
+		"bytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"deployedBytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"immutableReferences": {},
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"gasEstimates": null,
+		"methodIdentifiers": {
+			"onAbort((uint256,address,uint16,bytes,address))": "c3eef50a",
+			"onCall(bytes,uint16,address,bytes)": "31b1a88b",
+			"onRevert((uint256,address,uint16,bytes,bytes,(address,bool,uint256)))": "88028630"
+		}
+	},
+	"abi": [
+		{
+			"inputs": [
+				{
+					"components": [
+						{
+							"internalType": "uint256",
+							"name": "index",
+							"type": "uint256"
+						},
+						{
+							"internalType": "address",
+							"name": "sender",
+							"type": "address"
+						},
+						{
+							"internalType": "uint16",
+							"name": "chainID",
+							"type": "uint16"
+						},
+						{
+							"internalType": "bytes",
+							"name": "message",
+							"type": "bytes"
+						},
+						{
+							"internalType": "address",
+							"name": "abortAddress",
+							"type": "address"
+						}
+					],
+					"internalType": "struct IUniversalApp.AbortContext",
+					"name": "ctx",
+					"type": "tuple"
+				}
+			],
+			"name": "onAbort",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "bytes",
+					"name": "message",
+					"type": "bytes"
+				},
+				{
+					"internalType": "uint16",
+					"name": "originChain",
+					"type": "uint16"
+				},
+				{
+					"internalType": "address",
+					"name": "originSender",
+					"type": "address"
+				},
+				{
+					"internalType": "bytes",
+					"name": "",
+					"type": "bytes"
+				}
+			],
+			"name": "onCall",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"components": [
+						{
+							"internalType": "uint256",
+							"name": "index",
+							"type": "uint256"
+						},
+						{
+							"internalType": "address",
+							"name": "sender",
+							"type": "address"
+						},
+						{
+							"internalType": "uint16",
+							"name": "chainID",
+							"type": "uint16"
+						},
+						{
+							"internalType": "bytes",
+							"name": "message",
+							"type": "bytes"
+						},
+						{
+							"internalType": "bytes",
+							"name": "callData",
+							"type": "bytes"
+						},
+						{
+							"components": [
+								{
+									"internalType": "address",
+									"name": "abortAddress",
+									"type": "address"
+								},
+								{
+									"internalType": "bool",
+									"name": "callOnRevert",
+									"type": "bool"
+								},
+								{
+									"internalType": "uint256",
+									"name": "onRevertGasLimit",
+									"type": "uint256"
+								}
+							],
+							"internalType": "struct IUniversalApp.RevertOptions",
+							"name": "revertOptions",
+							"type": "tuple"
+						}
+					],
+					"internalType": "struct IUniversalApp.RevertContext",
+					"name": "ctx",
+					"type": "tuple"
+				}
+			],
+			"name": "onRevert",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}
+	]
+}

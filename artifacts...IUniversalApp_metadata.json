@@ -1,0 +1,177 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "index",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "sender",
+								"type": "address"
+							},
+							{
+								"internalType": "uint16",
+								"name": "chainID",
+								"type": "uint16"
+							},
+							{
+								"internalType": "bytes",
+								"name": "message",
+								"type": "bytes"
+							},
+							{
+								"internalType": "address",
+								"name": "abortAddress",
+								"type": "address"
+							}
+						],
+						"internalType": "struct IUniversalApp.AbortContext",
+						"name": "ctx",
+						"type": "tuple"
+					}
+				],
+				"name": "onAbort",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "message",
+						"type": "bytes"
+					},
+					{
+						"internalType": "uint16",
+						"name": "originChain",
+						"type": "uint16"
+					},
+					{
+						"internalType": "address",
+						"name": "originSender",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes",
+						"name": "",
+						"type": "bytes"
+					}
+				],
+				"name": "onCall",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "index",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "sender",
+								"type": "address"
+							},
+							{
+								"internalType": "uint16",
+								"name": "chainID",
+								"type": "uint16"
+							},
+							{
+								"internalType": "bytes",
+								"name": "message",
+								"type": "bytes"
+							},
+							{
+								"internalType": "bytes",
+								"name": "callData",
+								"type": "bytes"
+							},
+							{
+								"components": [
+									{
+										"internalType": "address",
+										"name": "abortAddress",
+										"type": "address"
+									},
+									{
+										"internalType": "bool",
+										"name": "callOnRevert",
+										"type": "bool"
+									},
+									{
+										"internalType": "uint256",
+										"name": "onRevertGasLimit",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct IUniversalApp.RevertOptions",
+								"name": "revertOptions",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct IUniversalApp.RevertContext",
+						"name": "ctx",
+						"type": "tuple"
+					}
+				],
+				"name": "onRevert",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"details": "Interface for Universal Apps on ZetaChain",
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/interfaces/IUniversalApp.sol": "IUniversalApp"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/interfaces/IUniversalApp.sol": {
+			"keccak256": "0xdac47cdc958ad4cf33b28d63cd8306451624a368bbbe922f2eadf4f3945cc366",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://858e62ed0397f5b4b5d9de928c9cd22917a6bd9705778b55645532e592d465da",
+				"dweb:/ipfs/QmP8sredu5gZ1svHDn2xtnW3ukqU1JTwdix5Ta8RJE557r"
+			]
+		}
+	},
+	"version": 1
+}
