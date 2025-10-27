@@ -1,0 +1,36 @@
+{
+  "name": "universal-nft-frontend",
+  "version": "1.0.0",
+  "description": "A Next.js frontend for UniversalNFT integrating with ZetaChain and Sepolia Testnets.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "ethers": "^5.6.9",
+    "wagmi": "^0.9.0",
+    "tailwindcss": "^3.0.0",
+    "postcss": "^8.0.0",
+    "autoprefixer": "^10.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-next": "latest",
+    "typescript": "^4.5.4"
+  },
+  "keywords": [
+    "nft",
+    "blockchain",
+    "nextjs",
+    "zetaChain",
+    "sepolia"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
